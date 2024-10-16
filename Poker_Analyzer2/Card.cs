@@ -59,6 +59,30 @@ namespace Poker_Analyzer2
                 return val;
             }
         }
+        public int GetSuitOrder()
+        {
+            int val = 0;
+            if (Suit == "Hearts")
+            {
+                val = 1;
+                return val;
+            }
+            else if (Suit == "Diamonds")
+            {
+                val = 2;
+                return val;
+            }
+            else if (Suit == "Clubs")
+            {
+                val = 3;
+                return val;
+            }
+            else
+            {
+                val = 4;
+                return val;
+            }
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -63,13 +64,72 @@ namespace Poker_Analyzer2
 
         private static Combination CheckTwoPair(List<Combination> result)
         {
-            List<int> twopairIndices = new List<int>();
-            
+            List<Combination> Twopair = new List<Combination>();
+            for (int i = 0; i < result.Count; i++)
+            {
+                if (result[i].CombinationTitle == CombinationTitle.Pair)
+                {
+                    Twopair.Add(result[i]);
+                }
+            }
+            if (Twopair.Count >= 2)
+            {
+                Twopair.OrderBy(x => x.Score);
+                var last = Twopair.Last();
+                var secondToLast = Twopair[Twopair.Count - 2];
+                var twoPairCards = new List<Card>();
+                twoPairCards.AddRange(last.Cards);
+                twoPairCards.AddRange(secondToLast.Cards);
+                return new Combination(twoPairCards.Sum(x => x.GetValue()) + TWO_PAIR_MODIFIER, twoPairCards, CombinationTitle.TwoPair);
+            }
+            else
+            {
+                return null;
+            }
+
+
         }
 
         private static Combination CheckFullHouse(List<Combination> result)
         {
-            throw new NotImplementedException();
+            List<Combination> Twopair = new List<Combination>();
+            for (int i = 0; i < result.Count; i++)
+            {
+                if (result[i].CombinationTitle == CombinationTitle.Pair)
+                {
+                    Twopair.Add(result[i]);
+                }
+            }
+            List<Combination> Set = new List<Combination>();
+            for (int i = 0; i < result.Count; i++)
+            {
+                if (result[i].CombinationTitle == CombinationTitle.Set)
+                {
+                    Set.Add(result[i]);
+                }
+            }
+            if (Twopair.Count == 0 || Set.Count == 0)
+            {
+                return null;
+
+            }
+
+            else if (Twopair.Count > 0 && Set.Count > 0)
+            {
+                Twopair.OrderBy(x => x.Score);
+                Set.OrderBy(x => x.Score);
+                Combination MaxSet = Set.Last();
+                for (int i = 0; i < Twopair.Count; i++)
+                {
+                    if (Twopair[i].cards.Last().GetValue() == MaxSet.cards.Last().GetValue())
+                    {
+                    }
+                }
+
+            }
+
+
+
         }
 
         private static Combination CheckRoyalFlush(List<Combination> result)
@@ -101,10 +161,10 @@ namespace Poker_Analyzer2
             {
                 for (int i = 0; i < flushIndices.Count; i++)
                 {
-                    result[flushIndices[i]].Cards.Sort(delegate (Card c1, Card c2) { return c1.GetValue().CompareTo(c2.GetValue());});
+                    result[flushIndices[i]].Cards.Sort(delegate (Card c1, Card c2) { return c1.GetValue().CompareTo(c2.GetValue()); });
                     if (result[flushIndices[i]].Cards.First().GetValue() == 10)
                         if (result[flushIndices[i]].Cards.First().Suit == result[foundRoyal].Cards.First().Suit)
-                            return new Combination(result[foundRoyal].Cards.Sum(x=>x.GetValue())+ROYALEFLUSH_MODIFIER, result[foundRoyal].Cards,CombinationTitle.RoyalFlush);
+                            return new Combination(result[foundRoyal].Cards.Sum(x => x.GetValue()) + ROYALEFLUSH_MODIFIER, result[foundRoyal].Cards, CombinationTitle.RoyalFlush);
                 }
             }
             return null;
