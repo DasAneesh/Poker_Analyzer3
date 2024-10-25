@@ -13,15 +13,15 @@ namespace Poker_Analyzer2
         public string Suit { get; }
         public string Rank { get; }
 
-        private int Index { get; }
 
-        public Card(string suit, string rank, int index)
+        public Card(string suit, string rank)
         {
             Suit = suit;
             Rank = rank;
-            Index = index;
+            
 
         }
+       
 
         public Card(Card card)
         {

@@ -20,7 +20,10 @@ namespace Poker_Analyzer2
         private const int ROYALEFLUSH_MODIFIER = 320;
         public static int GetMaxScore(List<Card> cards)
         {
-            return GetCombinations(cards).Max(x => x.Score);
+            return GetCombinations(cards).Max(x =>
+            {
+                return x != null ? x.Score : 0;
+            });
         }
         // HighCard,
         //Pair,*
@@ -43,6 +46,7 @@ namespace Poker_Analyzer2
             cards.Sort(delegate (Card c1, Card c2) { return c1.GetSuitOrder().CompareTo(c2.GetSuitOrder()); });
             result.AddRange(GetFlush(cards));
             result.Add(CheckRoyalFlush(result));
+            result.Add(CheckStraightFlush(result));
             result.Add(CheckFullHouse(result));
             result.Add(CheckTwoPair(result));
             result.Add(CheckHighCard(result, cards));
@@ -67,6 +71,7 @@ namespace Poker_Analyzer2
             List<Combination> Twopair = new List<Combination>();
             for (int i = 0; i < result.Count; i++)
             {
+                if (result[i] == null) continue;
                 if (result[i].CombinationTitle == CombinationTitle.Pair)
                 {
                     Twopair.Add(result[i]);
@@ -94,7 +99,9 @@ namespace Poker_Analyzer2
         {
             List<Combination> Twopair = new List<Combination>();
             for (int i = 0; i < result.Count; i++)
+
             {
+                if (result[i] == null) continue;
                 if (result[i].CombinationTitle == CombinationTitle.Pair)
                 {
                     Twopair.Add(result[i]);
@@ -103,41 +110,70 @@ namespace Poker_Analyzer2
             List<Combination> Set = new List<Combination>();
             for (int i = 0; i < result.Count; i++)
             {
+                if (result[i] == null) continue;
                 if (result[i].CombinationTitle == CombinationTitle.Set)
                 {
                     Set.Add(result[i]);
                 }
             }
+
             if (Twopair.Count == 0 || Set.Count == 0)
             {
                 return null;
 
             }
 
-            else if (Twopair.Count > 0 && Set.Count > 0)
+            else if (Twopair.Count > 1 && Set.Count > 0)
             {
                 Twopair.OrderBy(x => x.Score);
                 Set.OrderBy(x => x.Score);
                 Combination MaxSet = Set.Last();
-                for (int i = 0; i < Twopair.Count; i++)
+                for (int i = Twopair.Count - 1 - 1; i >= 0; i--)
                 {
-                    if (Twopair[i].cards.Last().GetValue() == MaxSet.cards.Last().GetValue())
+                    if (Twopair[i].Cards.Last().GetValue() != MaxSet.Cards.Last().GetValue())
                     {
+
+
+                        var cards = new List<Card>();
+                        cards.AddRange(Twopair[i].Cards);
+                        cards.AddRange(MaxSet.Cards);
+                        
+                        return new Combination(MaxSet.Cards.Sum(x => x.GetValue()) + Twopair[i].Cards.Sum(x => x.GetValue()) +
+                            FULLHOUSE_MODIFIER, cards, CombinationTitle.Fullhouse);
+                        
                     }
+                    
                 }
 
             }
+            return null;
 
 
 
         }
 
+        private static Combination CheckStraightFlush(List<Combination> result)
+        {
+            for (int i = 0; i < result.Count; i++)
+            {
+
+                if (result[i] == null) continue;
+                if (result[i].CombinationTitle == CombinationTitle.Flush && result[i].CombinationTitle == CombinationTitle.Straight)
+                {
+
+                    return new Combination(result[i].Cards.Sum(x => x.GetValue()) + STRAIGHTFLUSH_MODIFIER, result[i].Cards, CombinationTitle.StraightFlush);
+                } 
+                
+            }
+            return null;    
+        }
         private static Combination CheckRoyalFlush(List<Combination> result)
         {
             List<int> flushIndices = new List<int>();
             List<int> straightIndices = new List<int>();
             for (int i = 0; i < result.Count; i++)
             {
+                if (result[i] == null) continue;
                 if (result[i].CombinationTitle == CombinationTitle.Flush)
                 {
                     flushIndices.Add(i);

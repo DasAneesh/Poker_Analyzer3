@@ -15,13 +15,12 @@ namespace Poker_Analyzer2
         {
             string[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
             string[] ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
-            int index_ = 1;
+            
             foreach (var suit in suits)
             {
                 foreach (var rank in ranks)
                 {
-                    cards.Add(new Card(suit, rank, index_));
-                    index_++;
+                    cards.Add(new Card(suit, rank));
                 }
             }
             Shuffle();
