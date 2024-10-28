@@ -11,7 +11,7 @@ namespace Poker_Analyzer2
     {
 
         public string Strategy { get; set; } // Имя игрока
-        public List<Card> Hand { get; private set; } // Рука игрока (две карты)
+        public List<Card> Hand { get; set; } // Рука игрока (две карты)
 
         public int Chips = 1000;
         
@@ -28,14 +28,16 @@ namespace Poker_Analyzer2
             Chips = 1000;
         }
 
-        public void ShowHands()
+        public string ShowHands()
         {
-            Console.WriteLine(this.Strategy);
+            string ans = "";
+            ans += this.Strategy + "\n";
             foreach (var card in Hand)
             {
                 
-                Console.WriteLine($"{card.Rank} of {card.Suit}");
+                ans += $" {card.Rank} of {card.Suit} ";
             }
+            return ans;
         }
         public int Play()
         {

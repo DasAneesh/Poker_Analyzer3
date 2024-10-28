@@ -50,6 +50,8 @@ namespace Poker_Analyzer2
             player2.Hand.Add(deck.Deal());
             player2.Hand.Add(deck.Deal());
             deck.DrawCard();
+            Console.WriteLine(player1.Hand);
+            Console.WriteLine(player2.Hand);
         }
         private void FirstRound()
         {
@@ -119,16 +121,20 @@ namespace Poker_Analyzer2
 
       
         private void DetermineWinner()
-        {
-            List<Card> player1Cards = new List<Card>(player1.Hand);
-            player1Cards.AddRange(river_cards);
-            List<Card> player2Cards = new List<Card>(player2.Hand);
-            player1Cards.AddRange(river_cards);
-            int player1Max = CombinationHelper.GetMaxScore(player1Cards);
-            int player2Max = CombinationHelper.GetMaxScore(player2Cards);
+        { 
+            player1.Hand.AddRange(river_cards);
+            player2.Hand.AddRange(river_cards);
+            int player1Max = CombinationHelper.GetMaxScore(player1.Hand);
+            int player2Max = CombinationHelper.GetMaxScore(player2.Hand);
+            int WinnerPoints = player1Max > player2Max ? player1Max : player2Max;
+            int LoserPoints = player1Max < player2Max ? player1Max : player2Max;
+            Player Winner = player1Max > player2Max ? player1 : player2;
+            Player NotWinner = player1Max < player2Max ? player1 : player2;
+            
+            Console.WriteLine($"Win {Winner.Strategy} with points {WinnerPoints}, with cards {Winner.ShowHands()}");
+            Console.WriteLine($"Loses {NotWinner.Strategy} with points {LoserPoints}, with cards{NotWinner.ShowHands()}");
 
-            Winner = player1Max > player2Max ? player1Max :player2Max;
-        } 
-        
+        }
+
     }
 }

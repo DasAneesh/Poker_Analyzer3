@@ -52,7 +52,10 @@ namespace Poker_Analyzer2
             public Card Deal()
         {
             Shuffle();
-            if (cards.Count == 0) throw new InvalidOperationException("No cards left in the deck.");
+            if (CardsRemaining == 0)
+            {
+                throw new InvalidOperationException("No cards left in the deck.");
+            }
             var card = cards[0];
             cards.RemoveAt(0);
             return card;

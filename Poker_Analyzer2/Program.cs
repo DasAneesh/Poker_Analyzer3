@@ -20,28 +20,16 @@ namespace Poker_Analyzer2
             //    Card card = deck.DrawCard();
             //    Console.WriteLine(card);
             //}
-             
+
             //Console.WriteLine($"Карты в колоде: {deck.CardsRemaining}");
 
-            //Player p1 = new Player();
-            //Player p2 = new Player();
-            //GameEngine game = new GameEngine(p1,p2);
-            //game.Start();
+            Player p1 = new Player();
+            Player p2 = new Player();
+            GameEngine game = new GameEngine(p1,p2);
+            game.Start();
             //p1.ShowHands();
             //p2.ShowHands();
-            Console.WriteLine(
-            CombinationHelper.GetMaxScore(new List<Card>()
-            {
-                new Card("Hearts","9"),
-               
-                new Card("Diamonds", "10"),
-                new Card("Diamonds", "King"),
-                new Card("Diamonds", "Queen"),
-                new Card("Diamonds", "Ace"),
-                new Card("Diamonds", "Jack"),
-                new Card("Clubs", "10"),
-            })
-);
+
 
             Console.ReadKey();
         }

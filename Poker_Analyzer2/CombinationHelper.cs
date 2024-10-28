@@ -62,8 +62,9 @@ namespace Poker_Analyzer2
                 int highIndex = cards.FindIndex(x => x.GetValue() == highCard);
                 return new Combination(highCard, new List<Card>() { cards[highIndex] }, CombinationTitle.HighCard);
             }
-
             return null;
+
+
         }
 
         private static Combination CheckTwoPair(List<Combination> result)
@@ -85,6 +86,7 @@ namespace Poker_Analyzer2
                 var twoPairCards = new List<Card>();
                 twoPairCards.AddRange(last.Cards);
                 twoPairCards.AddRange(secondToLast.Cards);
+                Console.WriteLine("find TwoPair");
                 return new Combination(twoPairCards.Sum(x => x.GetValue()) + TWO_PAIR_MODIFIER, twoPairCards, CombinationTitle.TwoPair);
             }
             else
@@ -137,12 +139,12 @@ namespace Poker_Analyzer2
                         var cards = new List<Card>();
                         cards.AddRange(Twopair[i].Cards);
                         cards.AddRange(MaxSet.Cards);
-                        
+                        Console.WriteLine("find FullHouse");
                         return new Combination(MaxSet.Cards.Sum(x => x.GetValue()) + Twopair[i].Cards.Sum(x => x.GetValue()) +
                             FULLHOUSE_MODIFIER, cards, CombinationTitle.Fullhouse);
-                        
+
                     }
-                    
+
                 }
 
             }
@@ -154,234 +156,229 @@ namespace Poker_Analyzer2
 
         private static Combination CheckStraightFlush(List<Combination> result)
         {
-            for (int i = 0; i < result.Count; i++)
-            {
-
-                if (result[i] == null) continue;
-                if (result[i].CombinationTitle == CombinationTitle.Flush && result[i].CombinationTitle == CombinationTitle.Straight)
-                {
-
-                    return new Combination(result[i].Cards.Sum(x => x.GetValue()) + STRAIGHTFLUSH_MODIFIER, result[i].Cards, CombinationTitle.StraightFlush);
-                } 
-                
-            }
-            return null;    
-        }
-        private static Combination CheckRoyalFlush(List<Combination> result)
-        {
-            List<int> flushIndices = new List<int>();
             List<int> straightIndices = new List<int>();
             for (int i = 0; i < result.Count; i++)
             {
                 if (result[i] == null) continue;
-                if (result[i].CombinationTitle == CombinationTitle.Flush)
-                {
-                    flushIndices.Add(i);
-                }
                 if (result[i].CombinationTitle == CombinationTitle.Straight)
                 {
                     straightIndices.Add(i);
                 }
             }
-            int foundRoyal = -1;
-
             for (int j = 0; j < straightIndices.Count; j++)
             {
-                if (result[straightIndices[j]].Cards.First().GetValue() == 10)
+                if (GetFlush(result[straightIndices[j]].Cards) != null)
                 {
-                    foundRoyal = j;
-                    break;
+                    Console.WriteLine("find StraightFlush");
+                    return new Combination (result[straightIndices[j]].Cards.Sum(x => x.GetValue()) + STRAIGHTFLUSH_MODIFIER, result[straightIndices[j]].Cards, CombinationTitle.StraightFlush);
                 }
             }
-            if (foundRoyal != -1)
+            return null;
+        }
+    private static Combination CheckRoyalFlush(List<Combination> result)
+    {
+            List<int> straightIndices = new List<int>();
+            for (int i = 0; i < result.Count; i++)
             {
-                for (int i = 0; i < flushIndices.Count; i++)
+                if (result[i] == null) continue;
+                if (result[i].CombinationTitle == CombinationTitle.Straight)
                 {
-                    result[flushIndices[i]].Cards.Sort(delegate (Card c1, Card c2) { return c1.GetValue().CompareTo(c2.GetValue()); });
-                    if (result[flushIndices[i]].Cards.First().GetValue() == 10)
-                        if (result[flushIndices[i]].Cards.First().Suit == result[foundRoyal].Cards.First().Suit)
-                            return new Combination(result[foundRoyal].Cards.Sum(x => x.GetValue()) + ROYALEFLUSH_MODIFIER, result[foundRoyal].Cards, CombinationTitle.RoyalFlush);
+                    straightIndices.Add(i);
+                }
+            }
+            for (int j = 0; j < straightIndices.Count; j++)
+            {
+                if (GetFlush(result[straightIndices[j]].Cards) != null && result[straightIndices[j]].Cards.First().GetValue() == 10)
+                {
+                    Console.WriteLine("find RoyaleFlush");
+                    return new Combination(result[straightIndices[j]].Cards.Sum(x => x.GetValue()) + ROYALEFLUSH_MODIFIER, result[straightIndices[j]].Cards, CombinationTitle.RoyalFlush);
                 }
             }
             return null;
         }
 
-        private static List<Combination> GetFlush(List<Card> cards)
+    private static List<Combination> GetFlush(List<Card> cards)
+    {
+        List<Combination> combinations = new List<Combination>();
+        for (int i = 0; i < cards.Count - 3; i++)
         {
-            List<Combination> combinations = new List<Combination>();
-            for (int i = 0; i < cards.Count - 3; i++)
+            for (int j = i + 1; j < cards.Count - 2; j++)
             {
-                for (int j = i + 1; j < cards.Count - 2; j++)
+                for (int k = j + 1; k < cards.Count - 1; k++)
                 {
-                    for (int k = j + 1; k < cards.Count - 1; k++)
+                    for (int l = k + 1; l < cards.Count(); l++)
                     {
-                        for (int l = k + 1; l < cards.Count(); l++)
+                        for (int g = l + 1; g < cards.Count(); g++)
                         {
-                            for (int g = l + 1; g < cards.Count(); g++)
-                            {
 
-                                if (cards[i].Suit == cards[j].Suit &&
-                                    cards[i].Suit == cards[k].Suit &&
-                                    cards[i].Suit == cards[l].Suit &&
-                                    cards[i].Suit == cards[g].Suit)
-                                {
-                                    combinations.Add(
-                                        new Combination(
-                                            cards[i].GetValue() +
-                                            cards[j].GetValue() +
-                                            cards[k].GetValue() +
-                                            cards[l].GetValue() +
-                                            cards[g].GetValue() +
-                                            FLUSH_MODIFIER,
-                                            new List<Card>() {
+                            if (cards[i].Suit == cards[j].Suit &&
+                                cards[i].Suit == cards[k].Suit &&
+                                cards[i].Suit == cards[l].Suit &&
+                                cards[i].Suit == cards[g].Suit)
+                            {
+                                Console.WriteLine("find Flush");
+                                combinations.Add(
+                                    new Combination(
+                                        cards[i].GetValue() +
+                                        cards[j].GetValue() +
+                                        cards[k].GetValue() +
+                                        cards[l].GetValue() +
+                                        cards[g].GetValue() +
+                                        FLUSH_MODIFIER,
+                                        new List<Card>() {
                                         cards[i],
                                         cards[j],
                                         cards[k],
                                         cards[l],
                                         cards[g],
-                                            },
-                                           CombinationTitle.Flush));
-                                }
+                                        },
+                                       CombinationTitle.Flush));
                             }
                         }
                     }
                 }
             }
-            return combinations;
         }
+        return combinations;
+    }
 
-        private static List<Combination> GetStraight(List<Card> cards)
+    private static List<Combination> GetStraight(List<Card> cards)
+    {
+        List<Combination> combinations = new List<Combination>();
+        for (int i = 0; i < cards.Count - 4; i++)
         {
-            List<Combination> combinations = new List<Combination>();
-            for (int i = 0; i < cards.Count - 4; i++)
+            for (int j = i + 1; j < cards.Count - 3; j++)
             {
-                for (int j = i + 1; j < cards.Count - 3; j++)
+                for (int k = j + 1; k < cards.Count - 2; k++)
                 {
-                    for (int k = j + 1; k < cards.Count - 2; k++)
+                    for (int l = k + 1; l < cards.Count() - 1; l++)
                     {
-                        for (int l = k + 1; l < cards.Count() - 1; l++)
+                        for (int g = l + 1; g < cards.Count(); g++)
                         {
-                            for (int g = l + 1; g < cards.Count(); g++)
-                            {
 
-                                if (cards[i].GetValue() == cards[j].GetValue() - 1 &&
-                                    cards[i].GetValue() == cards[k].GetValue() - 2 &&
-                                    cards[i].GetValue() == cards[l].GetValue() - 3 &&
-                                    cards[i].GetValue() == cards[g].GetValue() - 4)
-                                {
-                                    combinations.Add(
-                                        new Combination(
-                                            cards[i].GetValue() +
-                                            cards[j].GetValue() +
-                                            cards[k].GetValue() +
-                                            cards[l].GetValue() +
-                                            cards[g].GetValue() +
-                                            STRAIGHT_MODIFIER,
-                                            new List<Card>() {
+                            if (cards[i].GetValue() == cards[j].GetValue() - 1 &&
+                                cards[i].GetValue() == cards[k].GetValue() - 2 &&
+                                cards[i].GetValue() == cards[l].GetValue() - 3 &&
+                                cards[i].GetValue() == cards[g].GetValue() - 4)
+                            {
+                                Console.WriteLine("find Straight");
+                                combinations.Add(
+                                    new Combination(
+                                        cards[i].GetValue() +
+                                        cards[j].GetValue() +
+                                        cards[k].GetValue() +
+                                        cards[l].GetValue() +
+                                        cards[g].GetValue() +
+                                        STRAIGHT_MODIFIER,
+                                        new List<Card>() {
                                         cards[i],
                                         cards[j],
                                         cards[k],
                                         cards[l],
                                         cards[g],
-                                            },
-                                           CombinationTitle.Straight));
-                                }
+                                        },
+                                       CombinationTitle.Straight));
                             }
                         }
                     }
                 }
             }
-            return combinations;
         }
+        return combinations;
+    }
 
-        private static Combination GetFourOfAKind(List<Card> cards)
+    private static Combination GetFourOfAKind(List<Card> cards)
+    {
+        for (int i = 0; i < cards.Count - 3; i++)
         {
-            for (int i = 0; i < cards.Count - 3; i++)
+            for (int j = i + 1; j < cards.Count - 2; j++)
             {
-                for (int j = i + 1; j < cards.Count - 2; j++)
+                for (int k = j + 1; k < cards.Count - 1; k++)
                 {
-                    for (int k = j + 1; k < cards.Count - 1; k++)
+                    for (int l = k + 1; l < cards.Count(); l++)
                     {
-                        for (int l = k + 1; l < cards.Count(); l++)
+                        if (cards[j].Rank == cards[i].Rank &&
+                            cards[j].Rank == cards[k].Rank &&
+                            cards[j].Rank == cards[l].Rank)
                         {
-                            if (cards[j].Rank == cards[i].Rank &&
-                                cards[j].Rank == cards[k].Rank &&
-                                cards[j].Rank == cards[l].Rank)
-                            {
-                                return new Combination(
-                                    cards[i].GetValue() +
-                                    cards[j].GetValue() +
-                                    cards[k].GetValue() +
-                                    cards[l].GetValue() +
-                                    FOUROFAKIND_MODIFIER,
-                                    new List<Card>() {
+                            Console.WriteLine("find 4");
+                            return new Combination(
+                                cards[i].GetValue() +
+                                cards[j].GetValue() +
+                                cards[k].GetValue() +
+                                cards[l].GetValue() +
+                                FOUROFAKIND_MODIFIER,
+                                new List<Card>() {
                                         cards[i],
                                         cards[j],
                                         cards[k],
                                         cards[l]
-                                    },
-                                   CombinationTitle.Fourofakind);
-                            }
+                                },
+                               CombinationTitle.Fourofakind);
                         }
                     }
                 }
             }
-            return null;
         }
+        return null;
+    }
 
-        private static List<Combination> GetSet(List<Card> cards)
+    private static List<Combination> GetSet(List<Card> cards)
+    {
+        List<Combination> combinations = new List<Combination>();
+        for (int i = 0; i < cards.Count - 2; i++)
         {
-            List<Combination> combinations = new List<Combination>();
-            for (int i = 0; i < cards.Count - 2; i++)
+            for (int j = i + 1; j < cards.Count - 1; j++)
             {
-                for (int j = i + 1; j < cards.Count - 1; j++)
+                for (int k = j + 1; k < cards.Count; k++)
                 {
-                    for (int k = j + 1; k < cards.Count; k++)
+                    if (cards[j].Rank == cards[i].Rank &&
+                        cards[i].Rank == cards[k].Rank)
                     {
-                        if (cards[j].Rank == cards[i].Rank &&
-                            cards[i].Rank == cards[k].Rank)
-                        {
-                            combinations.Add(
-                                new Combination(
-                                    cards[i].GetValue() +
-                                    cards[j].GetValue() +
-                                    cards[k].GetValue() +
-                                    SET_MODIFIER,
-                                    new List<Card>() {
-                                        cards[i],
-                                        cards[j],
-                                        cards[k]
-                                    },
-                                   CombinationTitle.Set));
-                        }
-                    }
-                }
-            }
-            return combinations;
-        }
-
-        private static List<Combination> GetAllPairs(List<Card> cards)
-        {
-            List<Combination> combinations = new List<Combination>();
-            for (int i = 0; i < cards.Count - 1; i++)
-            {
-                for (int j = i + 1; j < cards.Count; j++)
-                {
-                    if (cards[j].Rank == cards[i].Rank)
-                    {
+                        Console.WriteLine("find 3");
                         combinations.Add(
                             new Combination(
                                 cards[i].GetValue() +
-                                cards[j].GetValue(),
+                                cards[j].GetValue() +
+                                cards[k].GetValue() +
+                                SET_MODIFIER,
                                 new List<Card>() {
-                                    cards[i],
-                                    cards[j]
+                                        cards[i],
+                                        cards[j],
+                                        cards[k]
                                 },
-                                CombinationTitle.Pair));
+                               CombinationTitle.Set));
                     }
                 }
             }
-            return combinations;
         }
+        return combinations;
     }
+
+    private static List<Combination> GetAllPairs(List<Card> cards)
+    {
+        List<Combination> combinations = new List<Combination>();
+        for (int i = 0; i < cards.Count - 1; i++)
+        {
+            for (int j = i + 1; j < cards.Count; j++)
+            {
+                if (cards[j].Rank == cards[i].Rank)
+                {
+                    Console.WriteLine("find pair");
+                    combinations.Add(
+                        new Combination(
+                            cards[i].GetValue() +
+                            cards[j].GetValue(),
+                            new List<Card>() {
+                                    cards[i],
+                                    cards[j]
+                            },
+                            CombinationTitle.Pair));
+                }
+            }
+        }
+
+        return combinations;
+    }
+}
 }
