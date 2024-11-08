@@ -48,7 +48,8 @@
     <Compile Include="Combinations.cs" />
     <Compile Include="Deck.cs" />
     <Compile Include="GameEngine.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="MonteCarloPlayer.cs" />
+    <Compile Include="SimplePlayer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

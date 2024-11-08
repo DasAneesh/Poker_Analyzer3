@@ -20,7 +20,7 @@ namespace Poker_Analyzer2
             {
                 foreach (var rank in ranks)
                 {
-                    cards.Add(new Card(suit, rank));
+                    Cards.Add(new Card(suit, rank));
                 }
             }
             Shuffle();
@@ -29,23 +29,23 @@ namespace Poker_Analyzer2
         // Метод для перетасовки колоды
         public void Shuffle()
         {
-            int n = cards.Count;
+            int n = Cards.Count;
             while (n > 1)
             {
                 int k = rng.Next(n--);
-                var value = cards[k];
-                cards[k] = cards[n];
-                cards[n] = value;
+                var value = Cards[k];
+                Cards[k] = Cards[n];
+                Cards[n] = value;
             }
         }
 
         public void DrawCard()
         {
-            if (cards.Count == 0)
+            if (Cards.Count == 0)
                 throw new InvalidOperationException("No cards left in the deck.");
 
             
-            cards.RemoveAt(0);
+            Cards.RemoveAt(0);
             
         }
 
@@ -56,11 +56,12 @@ namespace Poker_Analyzer2
             {
                 throw new InvalidOperationException("No cards left in the deck.");
             }
-            var card = cards[0];
-            cards.RemoveAt(0);
+            var card = Cards[0];
+            Cards.RemoveAt(0);
             return card;
         }
-        public int CardsRemaining => cards.Count;
+        public int CardsRemaining => Cards.Count;
 
+        public List<Card> Cards { get => cards; set => cards = value; }
     }
 }

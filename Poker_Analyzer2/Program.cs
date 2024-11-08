@@ -23,9 +23,9 @@ namespace Poker_Analyzer2
 
             //Console.WriteLine($"Карты в колоде: {deck.CardsRemaining}");
 
-            Player p1 = new Player();
-            Player p2 = new Player();
-            GameEngine game = new GameEngine(p1,p2);
+            SimplePlayer p1 = new SimplePlayer();
+            MonteCarloPlayer p2 = new MonteCarloPlayer();
+            GameEngine game = new GameEngine(p1, p2);
             game.Start();
             //p1.ShowHands();
             //p2.ShowHands();

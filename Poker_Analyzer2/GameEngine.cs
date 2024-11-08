@@ -11,19 +11,20 @@ namespace Poker_Analyzer2
     {
         private Deck deck;
         private List<Card> river_cards;
-        private Player player1;
-        private Player player2;
+        private SimplePlayer player1;
+        private MonteCarloPlayer player2;
         public int Players1_bet;
         public int Players2_bet;
         public int pot;
         public int Winner;
-        public GameEngine(Player player1, Player player2)
+
+        public GameEngine(SimplePlayer p1, MonteCarloPlayer p2)
 
         {
             deck = new Deck();
             river_cards = new List<Card>();
-            this.player1 = player1;
-            this.player2 = player2;
+            this.player1 = p1;
+            this.player2 = p2;
             Players1_bet = 0;
             Players2_bet = 0;
             pot = 0;
@@ -56,9 +57,8 @@ namespace Poker_Analyzer2
         private void FirstRound()
         {
             // Логика первой ставки
-            Console.WriteLine("First betting round");
-            Players1_bet = player1.Play();
-            Players2_bet = player2.Play();
+            Players1_bet = (int)player1.SimpleStrategy();
+            Players2_bet = player2.MonteCarloStrategy(river_cards,deck.Cards );
 
             // Обработка ставок игроков
             pot += Players1_bet + Players2_bet;
@@ -80,9 +80,8 @@ namespace Poker_Analyzer2
         }
         private void SecondRound()
         {
-            Console.WriteLine("Second betting round");
-            Players1_bet = player1.Play();
-            Players2_bet = player2.Play();
+            Players1_bet = (int)player1.SimpleStrategy();
+            Players2_bet = player2.MonteCarloStrategy(river_cards, deck.Cards);
 
             pot += Players2_bet + Players1_bet;
         }
@@ -91,14 +90,14 @@ namespace Poker_Analyzer2
         {
             // Открываем одну карту
             river_cards.Add(deck.Deal());
-            Console.WriteLine("River cards after turn:");
-            ShowRiverCards();
+            
+            //ShowRiverCards();
         }
         private void ThirdRound()
         {
-            Console.WriteLine("Third betting round");
-            Players1_bet = player1.Play();
-            Players2_bet = player2.Play();
+
+            Players1_bet = (int)player1.SimpleStrategy();
+            Players2_bet = player2.MonteCarloStrategy(river_cards, deck.Cards);
 
             pot += Players2_bet + Players1_bet;
         }
@@ -107,14 +106,14 @@ namespace Poker_Analyzer2
         {
             // Открываем последнюю карту
             river_cards.Add(deck.Deal());
-            Console.WriteLine("Community cards after river:");
-            ShowRiverCards();
+
+            //ShowRiverCards();
         }
         private void FinalRound()
         {
-            Console.WriteLine("Final betting round");
-            Players1_bet = player1.Play();
-            Players2_bet = player2.Play();
+
+            Players1_bet = (int)player1.SimpleStrategy();
+            Players2_bet = player2.MonteCarloStrategy(river_cards, deck.Cards);
 
             pot += Players1_bet + Players2_bet;
         }
@@ -128,8 +127,8 @@ namespace Poker_Analyzer2
             int player2Max = CombinationHelper.GetMaxScore(player2.Hand);
             int WinnerPoints = player1Max > player2Max ? player1Max : player2Max;
             int LoserPoints = player1Max < player2Max ? player1Max : player2Max;
-            Player Winner = player1Max > player2Max ? player1 : player2;
-            Player NotWinner = player1Max < player2Max ? player1 : player2;
+            SimplePlayer Winner = player1Max > player2Max ? player1 : player2;
+            SimplePlayer NotWinner = player1Max < player2Max ? player1 : player2;
             
             Console.WriteLine($"Win {Winner.Strategy} with points {WinnerPoints}, with cards {Winner.ShowHands()}");
             Console.WriteLine($"Loses {NotWinner.Strategy} with points {LoserPoints}, with cards{NotWinner.ShowHands()}");
